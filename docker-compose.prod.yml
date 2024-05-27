@@ -1,0 +1,53 @@
+version: "3"
+
+services:
+  web:
+    container_name: app
+    build:
+      context: ./services/web
+      dockerfile: Dockerfile
+    command: gunicorn --bind 0.0.0.0:5000 manage:app
+    entrypoint: dockerize -wait tcp://db:3306 -timeout 30s
+    # ports:
+    #   - 5000:5000
+    expose:
+      - 5000
+    env_file:
+      - ./.env.prod
+    tty: true
+    depends_on:
+      - db
+    networks:
+      - flask-network
+
+  db:
+    image: mysql:latest
+    container_name: db
+    restart: always
+    volumes:
+      - my_sql_volume:/var/lib/mysql
+    environment:
+      MYSQL_ROOT_PASSWORD: root
+      MYSQL_DATABASE: app
+    networks:
+      - flask-network
+
+  ngnix:
+    container_name: nginx
+    build:
+      context: ./services/nginx
+      dockerfile: Dockerfile
+    ports:
+      - 8080:80
+    depends_on:
+      - web
+    networks:
+      - flask-network
+
+
+volumes:
+  my_sql_volume:
+
+networks:
+  flask-network:
+    driver: bridge
