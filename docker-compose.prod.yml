@@ -10,6 +10,8 @@ services:
     entrypoint: dockerize -wait tcp://db:3306 -timeout 30s
     # ports:
     #   - 5000:5000
+    volumes:
+      - ./services/web/:/usr/src/app/
     expose:
       - 5000
     env_file:

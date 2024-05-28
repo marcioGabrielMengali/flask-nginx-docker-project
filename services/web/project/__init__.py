@@ -20,7 +20,7 @@ class People(db.Model):
 @app.route("/")
 def hello_world():
     try:
-        new_person = People(first_name='Batman', last_name='Robin')
+        new_person = People(first_name='Meu', last_name='Nome')
         db.session.add(new_person)
         db.session.commit()
         people = People.query.all()
